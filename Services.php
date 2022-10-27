@@ -28,8 +28,10 @@ cors();
 include './DBCnx.php';
 include './Controller.php';
 include './Users.php';
+include './Parks.php';
 
 $users_services = new Users();
+$parks_services = new Parks();
 
 $servicesName = $_GET['servicesName'] ?? '';
 
@@ -43,5 +45,10 @@ switch ($servicesName) {
         echo json_encode($users_services->get_all_user_by_rol());
         break;
 
+    //parks services
+    case 'get_parks_by_municipality':
+        if ($_GET['search_municipality'])
+        echo json_encode($parks_services->get_parks_by_municipality(json_decode($_GET['search_municipality'])));
+        break;
 
 }

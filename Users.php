@@ -12,7 +12,7 @@ class Users extends Controller {
     }
 
     public function get_all_user_by_rol () {
-        $query = "SELECT users.firstName, users.lastname, users.academicTitle, users.email, roles.rol as rol FROM users inner join roles on roles.id = users.id;";
+        $query = "SELECT users.firstName, users.lastname, users.academicTitle, users.email, roles.rol as rol FROM users inner join roles on roles.id = users.id_rol;";
         return $this->select_query($query);
     }
 
