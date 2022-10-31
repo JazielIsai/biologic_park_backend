@@ -118,9 +118,11 @@ INSERT INTO municipality_bp(nameMunicipality, idCityState) VALUES
 
 SELECT * FROM municipality_bp WHERE nameMunicipality = 'Leon';
 
-SELECT municipality_bp.id, municipality_bp.nameMunicipality, city_states_bp.nameCityStates AS cityState
+SELECT municipality_bp.id, municipality_bp.nameMunicipality,
+       city_states_bp.nameCityStates AS cityState
 FROM municipality_bp
-INNER JOIN city_states_bp ON municipality_bp.idCityState = city_states_bp.id;
+INNER JOIN city_states_bp
+    ON municipality_bp.idCityState = city_states_bp.id;
 
 CREATE TABLE IF NOT EXISTS  parks_data (
     id int not null primary key auto_increment,
@@ -144,9 +146,10 @@ CREATE TABLE IF NOT EXISTS  parks_data (
 
 DROP TABLE IF EXISTS parks_data;
 
-INSERT INTO parks_data(namePark, trainingbackground, areaha, form, boundaries,
-                       recreationareas, street, suburb, latitude, length,
-                       idmunicipality, idcitystates, idUser)
+INSERT INTO parks_data
+    (namePark, trainingbackground, areaha, form, boundaries,
+     recreationareas, street, suburb, latitude, length,
+     idmunicipality, idcitystates, idUser)
 VALUES
     ('Irekua Park', '', '5', 'Reactangular', '', '', 'Jardines de Irapuato', 'Av. Guerreroz', 20.7206124, -101.391474313, 16, 1, 1);
 
@@ -164,15 +167,32 @@ INSERT INTO parks_data(namePark, trainingbackground, areaha, form, boundaries,
 VALUES
     ('Gorrión Doméstico', '', '', '', '', '', '', '', 21.1218994, -101.736051412, 19, 1, 3);
 
+UPDATE parks_data
+SET namePark = 'Leon Gto' WHERE id = 3;
 
 
+SELECT * FROM parks_data;
+
+-- by id
+SELECT * FROM parks_data WHERE id = ?;
+
+-- by municipality
 SELECT namePark, trainingBackground, areaHa, form,
        boundaries, recreationAreas, street, suburb, latitude, length,
        municipality_bp.nameMunicipality AS municipality, city_states_bp.nameCityStates AS cityState
 FROM parks_data
 INNER JOIN municipality_bp ON parks_data.idMunicipality = municipality_bp.id
 INNER JOIN city_states_bp ON parks_data.idCityStates = city_states_bp.id
-WHERE municipality_bp.nameMunicipality = 'Irapuato';
+WHERE municipality_bp.nameMunicipality  LIKE 'Irapuato';
+
+-- by city state
+SELECT namePark, trainingBackground, areaHa, form,
+       boundaries, recreationAreas, street, suburb, latitude, length,
+       municipality_bp.nameMunicipality AS municipality, city_states_bp.nameCityStates AS cityState
+FROM parks_data
+INNER JOIN municipality_bp ON parks_data.idMunicipality = municipality_bp.id
+INNER JOIN city_states_bp ON parks_data.idCityStates = city_states_bp.id
+WHERE city_states_bp.nameCityStates  LIKE 'Guanajauto';
 
 
 
@@ -184,6 +204,19 @@ FROM parks_data
 INNER JOIN municipality_bp ON parks_data.idMunicipality = municipality_bp.id
 INNER JOIN city_states_bp ON parks_data.idCityStates = city_states_bp.id
 INNER JOIN users ON parks_data.idUser = users.id;
+
+
+SELECT namePark, trainingBackground, areaHa, form, boundaries,
+       recreationAreas, street, suburb, latitude, length,
+       municipality_bp.nameMunicipality as municipality,
+       city_states_bp.nameCityStates AS cityState,
+       users.firstName AS ParkWasRegisterByUser
+FROM parks_data
+INNER JOIN municipality_bp ON parks_data.idMunicipality = municipality_bp.id
+INNER JOIN city_states_bp ON parks_data.idCityStates = city_states_bp.id
+INNER JOIN users ON parks_data.idUser = users.id
+WHERE parks_data.namePark LIKE ?;
+
 
 
 CREATE TABLE IF NOT EXISTS images_parks (
@@ -225,7 +258,10 @@ VALUES
     ('Protozoarios'),
     ('Desconocido');
 
-SELECT * FROM category;
+SELECT id, description FROM category;
+
+SELECT id, description FROM category WHERE id = ?;
+
 
 CREATE TABLE IF NOT EXISTS biologic_data(
     id int not null auto_increment primary key,
@@ -252,8 +288,50 @@ VALUES ('Calandria Dorso Negro Menor', 'Hooded oriole (Icterus cucullatus)',
         '', 'Bosques abiertos, árboles de sombra y palmeras. Se reproduce en bosques de árboles como el álamo, el nogal y el sicomoro, a lo largo de arroyos y en cañones, y en bosques abiertos en tierras bajas. Es común verlo en suburbios y parques urbanos. Por lo general, prefiere las palmeras y arma su nido en grupos de palmeras aislados, incluso en las ciudades.',
         true, 'Lives of North American Birds', 1, 1);
 
+INSERT INTO biologic_data(commonName, scientificName,
+                          description, geographicalDistribution,
+                          naturalHistory, statusConservation, authorBiologicData,
+                          idCategory, idUser)
+VALUES ('Gorrión Doméstico', 'Passer domesticus',
+        'Una de las aves cantoras más expandidas y abundantes en el mundo actual, el gorrión común tiene una fórmula simple para el éxito: se asocia con los seres humanos. Autóctono de Eurasia y del norte de África, ha tenido éxito en las áreas urbanas y agrícolas de todo el mundo, incluida América del Norte, donde fue liberado por primera vez en Nueva York en 1851. Es resistente, adaptable y agresivo, razón por la cual sobrevive en las aceras de la ciudad, donde pocas aves lo logran. En las zonas rurales, puede desalojar a las aves autóctonas de sus nidos.',
+        '', 'Ciudades, pueblos y granjas. Los entornos generales varían, pero en especial en América del Norte, siempre se lo encuentra alrededor de las estructuras levantadas por el hombre y nunca en hábitats naturales vírgenes. Vive en centros de ciudades, suburbios y granjas. También en casas o edificios aislados que se encuentren rodeados por un terreno inadecuado para los gorriones comunes, como el desierto o el bosque.',
+        true, 'Audubon', 1, 2),
+        ('Búho Cara Oscura', 'Stygian owl (Asio stygius)',
+        'El búho cara oscura (Asio stygius) es un estrígido neotropical de amplia pero discontinua distribución en las zonas intertropicales y subtropicales del continente americano (Howell y Webb 1995). Su distribución conocida abarca desde el norte de México hasta el norte de Argentina, e incluye registros accidentales en el sur de Texas, EUA (Wright y Wright 1997, Cooksey 1998). A través de esta vasta área, el búho cara oscura se encuentra en un amplio intervalo altitudinal (1500-3000 msnm) y de tipos de vegetación que van desde bosques perennifolios, bosques de pino, pino-encino, selvas perennifolias, bosques tropicales caducifolios de tierras bajas, sabanas, parques y áreas abiertas arboladas (Holt et al. 1999, Rodríguez-Ruiz y Herrera-Herrera 2009, Arizmendi et al. 2010).',
+        '', 'El 5 de agosto de 2011 dos oficiales de la policía municipal de Landa de Matamoros, Querétaro, se presentaron en las instalaciones del Grupo Ecológico Sierra Gorda (municipio de Jalpan de Serra) con el fin de buscar ayuda y atención para un ejemplar adulto de A. stygius. El ave había sido previamente decomisada por los oficiales cuando se percataron que vecinos del municipio habían agredido al ejemplar con un arma de fuego (Figura 1). Al momento de ser lesionado, el búho se encontraba posando en un encino (Quercus mexicana) en un ecotono entre matorral sub-montano y bosque de encino (21°11''50"N, 99° 19''46"O; 1080 m snm). El sitio es un conjunto de lomeríos en el interior de los valles intermontanos del centro de la RBSG. Los elementos florísticos característicos del sitio son Acacia micrantha, Cordia boissieri, Helietta parvifolia, Mimosa leucaenoides, Pithecellobium pallens, Quercus mexicana, entre otros.',
+        true, 'Alan Monroy-Ojeda1* y Roberto Pedraza-Ruiz2', 1, 2);
+
 
 SELECT * FROM biologic_data;
+
+SELECT biologic_data.commonName, biologic_data.scientificName, biologic_data.description,
+       biologic_data.geographicalDistribution, biologic_data.naturalHistory,
+       biologic_data.statusConservation, biologic_data.authorBiologicData,
+       category.description as category,
+       users.firstName as user
+FROM biologic_data
+INNER JOIN category ON biologic_data.idCategory = category.id
+INNER JOIN users on biologic_data.idUser = users.id;
+
+SELECT biologic_data.commonName, biologic_data.scientificName, biologic_data.description,
+       biologic_data.geographicalDistribution, biologic_data.naturalHistory,
+       biologic_data.statusConservation, biologic_data.authorBiologicData,
+       category.description as category,
+       users.firstName as user
+FROM biologic_data
+INNER JOIN category ON biologic_data.idCategory = category.id
+INNER JOIN users on biologic_data.idUser = users.id
+WHERE biologic_data.commonName LIKE ?;
+
+SELECT biologic_data.commonName, biologic_data.scientificName, biologic_data.description,
+       biologic_data.geographicalDistribution, biologic_data.naturalHistory,
+       biologic_data.statusConservation, biologic_data.authorBiologicData,
+       category.description as category,
+       users.firstName as user
+FROM biologic_data
+INNER JOIN category ON biologic_data.idCategory = category.id
+INNER JOIN users on biologic_data.idUser = users.id
+WHERE biologic_data.scientificName LIKE ?;
 
 
 DROP TABLE IF EXISTS biologic_data;
@@ -281,6 +359,7 @@ VALUES ('Calandria Dorso Negro Menor - Icterus cucullatus',
         'efrenbiologia', DEFAULT, 1, 1);
 
 
+
 SELECT name, ruta, author,sightingDate, idBiologicalData, users.firstName AS imageWasResgisterByUser
 FROM images
 INNER JOIN users ON images.idUser = users.id;
@@ -298,12 +377,20 @@ CREATE TABLE IF NOT EXISTS pivot_biologic_park (
 DROP TABLE IF EXISTS pivot_biologic_park;
 
 
+SELECT * FROM pivot_biologic_park;
+
+
 INSERT INTO pivot_biologic_park(idBiologic, idParksData)
 VALUES (1,1);
 
-SELECT images.name AS image, biologic_data.commonName, parks_data.namePark
+
+INSERT INTO pivot_biologic_park(idBiologic, idParksData)
+VALUES (2,2), (3, 3);
+
+
+SELECT biologic_data.commonName AS commonName,
+       parks_data.namePark AS namePark
 FROM pivot_biologic_park
-INNER JOIN images ON pivot_biologic_park.idImage = images.id
-INNER JOIN biologic_data ON images.idBiologicalData = biologic_data.id
+INNER JOIN biologic_data ON pivot_biologic_park.idBiologic = biologic_data.id
 INNER JOIN parks_data ON pivot_biologic_park.idParksData = parks_data.id;
 

@@ -3,12 +3,11 @@
 class Controller extends DBCnx
 {
 
-    public function __construct($db)
-    {
+    public function __construct($db) {
         parent::__construct($db);
     }
 
-    public function select_query($query, $params = []) {
+    protected function select_query ($query, $params = []) {
         try {
             $data = array();
 
@@ -37,7 +36,7 @@ class Controller extends DBCnx
 
     }
 
-    public function insert_query ($query, $data) {
+    protected function insert_query ($query, $data) {
 
         try {
             $prepare_query = $this->Connection()->prepare($query);
@@ -57,7 +56,7 @@ class Controller extends DBCnx
 
     }
 
-    public function update_delete_query ($query, $data) {
+    protected function update_delete_query ($query, $data) {
         try {
 
             $prepare_query = $this->Connection()->prepare($query);
