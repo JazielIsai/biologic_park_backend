@@ -11,7 +11,7 @@ class DBCnx {
     public function __construct($db) {
 
         $file = "configuration.ini";
-        if (!$file = parse_ini_file($file, true)){
+        if ( !$file = parse_ini_file($file, true) ){
             echo "File wasn't able to open";
         }
 

@@ -9,7 +9,7 @@ class Parks extends Controller {
 
     // GET
     public function get_all_parks () {
-        $query = " 
+        $query = "
             SELECT namePark, trainingBackground, areaHa, form, 
                    boundaries, recreationAreas, street, suburb, latitude, length,
                    municipality_bp.nameMunicipality AS municipality, city_states_bp.nameCityStates AS cityState,

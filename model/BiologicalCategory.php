@@ -17,4 +17,6 @@ class BiologicalCategory extends Controller {
         return $this->select_query($query);
     }
 
+
+
 }

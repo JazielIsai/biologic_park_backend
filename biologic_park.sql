@@ -217,6 +217,17 @@ INNER JOIN city_states_bp ON parks_data.idCityStates = city_states_bp.id
 INNER JOIN users ON parks_data.idUser = users.id
 WHERE parks_data.namePark LIKE ?;
 
+SELECT namePark, trainingBackground, areaHa, form, boundaries,
+       recreationAreas, street, suburb, latitude, length,
+       municipality_bp.nameMunicipality as municipality,
+       city_states_bp.nameCityStates AS cityState,
+       users.firstName AS ParkWasRegisterByUser
+FROM parks_data
+INNER JOIN municipality_bp ON parks_data.idMunicipality = municipality_bp.id
+INNER JOIN city_states_bp ON parks_data.idCityStates = city_states_bp.id
+INNER JOIN users ON parks_data.idUser = users.id
+WHERE parks_data.namePark LIKE ?;
+
 
 
 CREATE TABLE IF NOT EXISTS images_parks (
@@ -304,6 +315,7 @@ VALUES ('Gorrión Doméstico', 'Passer domesticus',
 
 SELECT * FROM biologic_data;
 
+
 SELECT biologic_data.commonName, biologic_data.scientificName, biologic_data.description,
        biologic_data.geographicalDistribution, biologic_data.naturalHistory,
        biologic_data.statusConservation, biologic_data.authorBiologicData,
@@ -312,6 +324,7 @@ SELECT biologic_data.commonName, biologic_data.scientificName, biologic_data.des
 FROM biologic_data
 INNER JOIN category ON biologic_data.idCategory = category.id
 INNER JOIN users on biologic_data.idUser = users.id;
+
 
 SELECT biologic_data.commonName, biologic_data.scientificName, biologic_data.description,
        biologic_data.geographicalDistribution, biologic_data.naturalHistory,
@@ -322,6 +335,7 @@ FROM biologic_data
 INNER JOIN category ON biologic_data.idCategory = category.id
 INNER JOIN users on biologic_data.idUser = users.id
 WHERE biologic_data.commonName LIKE ?;
+
 
 SELECT biologic_data.commonName, biologic_data.scientificName, biologic_data.description,
        biologic_data.geographicalDistribution, biologic_data.naturalHistory,
@@ -349,20 +363,22 @@ CREATE TABLE IF NOT EXISTS images (
     CONSTRAINT id_user_img FOREIGN KEY (idUser) REFERENCES users(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+RENAME TABLE images TO images_biologic_data;
 
 DROP TABLE IF EXISTS images;
 
 
 INSERT INTO images(name, ruta, author,sightingDate, idBiologicalData, idUser)
 VALUES ('Calandria Dorso Negro Menor - Icterus cucullatus',
-        '/var/www/html/biological_parks_backend/Categorias/Pajaros/Calandria Dorso Negro Menor.jpeg',
+        '/var/www/html/biological_parks_backend/Images/ImgBiologicData/Calandria Dorso Negro Menor.jpeg',
         'efrenbiologia', DEFAULT, 1, 1);
 
 
 
-SELECT name, ruta, author,sightingDate, idBiologicalData, users.firstName AS imageWasResgisterByUser
-FROM images
-INNER JOIN users ON images.idUser = users.id;
+SELECT name, ruta, author,sightingDate, idBiologicalData,
+       users.firstName AS imageWasResgisterByUser
+FROM images_biologic_data
+INNER JOIN users ON images_biologic_data.idUser = users.id;
 
 
 CREATE TABLE IF NOT EXISTS pivot_biologic_park (
@@ -393,4 +409,3 @@ SELECT biologic_data.commonName AS commonName,
 FROM pivot_biologic_park
 INNER JOIN biologic_data ON pivot_biologic_park.idBiologic = biologic_data.id
 INNER JOIN parks_data ON pivot_biologic_park.idParksData = parks_data.id;
-
