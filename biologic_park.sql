@@ -31,9 +31,17 @@ VALUES
     ('Maximiliano', 'Ruiz Manjarrez', 'Ing. Sistemas Computacionales', 'max@gmail.com', '12345', 2),
     ('Sergio Luis', 'Sanchez', 'Ing. Sistemas Computacionales', 'sergio@gmail.com', '12345', 1);
 
+UPDATE users
+SET password = '123456'
+WHERE id = 2;
 
-SELECT firstname, lastname, academicTitle, email FROM users;
+SELECT id, firstname, lastname, academicTitle, email FROM users;
 
+SELECT users.id, firstname, lastname, academicTitle, email, id_rol,
+       roles.rol as Rol
+FROM users
+INNER JOIN roles ON users.id_rol = roles.id
+WHERE email = 'carla@gmail.com' AND password = '12345';
 
 SELECT
     firstName, lastname, academicTitle, email, roles.rol AS rol
@@ -241,11 +249,29 @@ CREATE TABLE IF NOT EXISTS images_parks (
   CONSTRAINT id_user_img_pk FOREIGN KEY (idUser) REFERENCES users(id)
 );
 
+ALTER TABLE images_parks
+    ADD COLUMN sightingDate date;
+
+SELECT * FROM images_parks;
+
 DROP TABLE IF EXISTS images_parks;
 
 INSERT INTO images_parks(name, ruta, author, idParks, idUser)
 VALUES
     ('Canario', '/var/www/html/biologic_park_backend/categories/pajaro/', 'Marion', 1, 2);
+
+SELECT images_parks.id,
+       images_parks.name,
+       images_parks.ruta,
+       images_parks.author,
+       images_parks.sightingDate,
+       images_parks.idParks,
+       users.firstName AS imageWasResgisterByUser
+FROM images_parks
+INNER JOIN users ON images_parks.idUser = users.id
+WHERE images_parks.idParks = ?;
+
+
 
 
 CREATE TABLE IF NOT EXISTS category (
@@ -351,7 +377,7 @@ WHERE biologic_data.scientificName LIKE ?;
 DROP TABLE IF EXISTS biologic_data;
 
 
-CREATE TABLE IF NOT EXISTS images (
+CREATE TABLE IF NOT EXISTS images_biologic_data (
     id int not null auto_increment primary key,
     name text not null,
     ruta text not null,
@@ -363,22 +389,48 @@ CREATE TABLE IF NOT EXISTS images (
     CONSTRAINT id_user_img FOREIGN KEY (idUser) REFERENCES users(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-RENAME TABLE images TO images_biologic_data;
+-- RENAME TABLE images TO images_biologic_data;
 
-DROP TABLE IF EXISTS images;
+DROP TABLE IF EXISTS images_biologic_data;
 
 
-INSERT INTO images(name, ruta, author,sightingDate, idBiologicalData, idUser)
+INSERT INTO images_biologic_data(name, ruta, author,sightingDate, idBiologicalData, idUser)
 VALUES ('Calandria Dorso Negro Menor - Icterus cucullatus',
         '/var/www/html/biological_parks_backend/Images/ImgBiologicData/Calandria Dorso Negro Menor.jpeg',
         'efrenbiologia', DEFAULT, 1, 1);
-
 
 
 SELECT name, ruta, author,sightingDate, idBiologicalData,
        users.firstName AS imageWasResgisterByUser
 FROM images_biologic_data
 INNER JOIN users ON images_biologic_data.idUser = users.id;
+
+
+SELECT images_biologic_data.id,
+       images_biologic_data.name,
+       images_biologic_data.ruta,
+       images_biologic_data.author,
+       images_biologic_data.sightingDate,
+       images_biologic_data.idBiologicalData,
+       users.firstName AS imageWasResgisterByUser
+FROM images_biologic_data
+INNER JOIN users ON images_biologic_data.idUser = users.id
+WHERE images_biologic_data.idBiologicalData = ?;
+
+
+SELECT images_biologic_data.id, images_biologic_data.name,
+       images_biologic_data.ruta, images_biologic_data.author,
+       images_biologic_data.sightingDate, images_biologic_data.idBiologicalData,
+       biologic_data.id AS id_tl_biologic_data,
+       biologic_data.commonName, biologic_data.scientificName, biologic_data.description,
+       biologic_data.geographicalDistribution, biologic_data.naturalHistory,
+       biologic_data.statusConservation, biologic_data.authorBiologicData,
+       category.description AS category
+FROM images_biologic_data
+RIGHT JOIN biologic_data ON images_biologic_data.idBiologicalData = biologic_data.id
+INNER JOIN category ON biologic_data.idCategory = category.id
+WHERE biologic_data.id = ?;
+
 
 
 CREATE TABLE IF NOT EXISTS pivot_biologic_park (
@@ -404,8 +456,61 @@ INSERT INTO pivot_biologic_park(idBiologic, idParksData)
 VALUES (2,2), (3, 3);
 
 
-SELECT biologic_data.commonName AS commonName,
-       parks_data.namePark AS namePark
+
+SELECT
+    biologic_data.commonName,
+    biologic_data.scientificName,
+    biologic_data.description,
+    biologic_data.authorBiologicData,
+    biologic_data.naturalHistory,
+    biologic_data.geographicalDistribution,
+    parks_data.namePark,
+    parks_data.recreationAreas,
+    parks_data.latitude,
+    parks_data.length,
+    parks_data.street,
+    parks_data.suburb
 FROM pivot_biologic_park
 INNER JOIN biologic_data ON pivot_biologic_park.idBiologic = biologic_data.id
-INNER JOIN parks_data ON pivot_biologic_park.idParksData = parks_data.id;
+INNER JOIN parks_data ON pivot_biologic_park.idParksData = parks_data.id
+WHERE biologic_data.id = ?;
+
+SELECT * FROM biologic_data;
+SELECT * FROM parks_data;
+SELECT * FROM images_biologic_data;
+
+SELECT pivot_biologic_park.id,
+       pivot_biologic_park.idBiologic,
+       pivot_biologic_park.idParksData,
+       biologic_data.commonName AS commonName,
+       biologic_data.scientificName AS scientificName,
+       parks_data.namePark as NamePark,
+       parks_data.street AS Street,
+       parks_data.suburb AS Suburb,
+       images_biologic_data.name AS name_img_biologic_data,
+       images_biologic_data.ruta AS path_img_biologic_data,
+       images_parks.name as name_img_parks,
+       images_parks.ruta AS path_img_parks
+FROM pivot_biologic_park
+RIGHT OUTER JOIN biologic_data ON pivot_biologic_park.idBiologic = biologic_data.id
+RIGHT OUTER JOIN parks_data ON pivot_biologic_park.idParksData = parks_data.id
+LEFT JOIN images_biologic_data ON biologic_data.id = images_biologic_data.idBiologicalData
+LEFT JOIN images_parks ON parks_data.id = images_parks.idParks
+ORDER BY pivot_biologic_park.id DESC;
+
+SELECT biologic_data.commonName AS commonName,
+       biologic_data.scientificName AS scientificName,
+       parks_data.namePark as NamePark,
+       parks_data.street AS Street,
+       parks_data.suburb AS Suburb,
+       images_biologic_data.ruta AS path_img_biologic_data,
+       images_parks.ruta AS path_img_parks,
+       users.firstname AS User
+FROM pivot_biologic_park
+INNER JOIN biologic_data ON pivot_biologic_park.idBiologic = biologic_data.id
+INNER JOIN parks_data ON pivot_biologic_park.idParksData = parks_data.id
+INNER JOIN users ON biologic_data.idUser = users.id
+INNER JOIN images_biologic_data ON biologic_data.id = images_biologic_data.idBiologicalData
+INNER JOIN images_parks ON parks_data.id = images_parks.idParks
+WHERE users.id = ?;
+

@@ -32,6 +32,8 @@ include_once './model/Parks.php';
 include_once './model/BiologicalCategory.php';
 include_once './model/BiologicData.php';
 include_once './model/CityState.php';
+include_once './model/ImagesBiologicData.php';
+include_once './model/ImageParkData.php';
 include_once './model/PivotBiologicPark.php';
 
 $users_services = new Users();
@@ -39,6 +41,8 @@ $parks_services = new Parks();
 $category_services = new BiologicalCategory();
 $biologicalData_services = new BiologicData();
 $cityState_services = new CityState();
+$images_biologic_data = new ImagesBiologicData();
+$images_park_data = new ImageParkData();
 $pivotBiologicPark_services = new PivotBiologicPark();
 
 $servicesName = $_GET['servicesName'] ?? '';
@@ -51,6 +55,11 @@ switch ($servicesName) {
         break;
     case 'get_all_user_by_rol':
         echo json_encode($users_services->get_all_user_by_rol());
+        break;
+    case 'checking_if_exist_user':
+        if(isset( $_GET['email'], $_GET['password'] )){
+            echo json_encode($users_services->checking_if_exist_user($_GET['email'], $_GET['password']));
+        }
         break;
 
     //parks services
@@ -112,9 +121,34 @@ switch ($servicesName) {
         echo json_encode($cityState_services->get_all_municipality_by_state());
         break;
 
+    // services to images biologic data table
+    case 'get_img_by_biologic_data_id':
+        if (isset($_GET['biologic_data_id'])) {
+            echo json_encode($images_biologic_data->get_img_by_biologic_data_id($_GET['biologic_data_id']));
+        }
+        break;
+    case 'get_img_with_biologic_data_and_category':
+        if (isset($_GET['biologic_data_id'])) {
+            echo json_encode($images_biologic_data->get_img_with_biologic_data_and_category($_GET['biologic_data_id']));
+        }
+        break;
+
+    // services to img parks data table
+    case 'get_image_by_parks_data_id':
+        if ($_GET['parks_data_id']) {
+            echo json_encode($images_park_data->get_image_by_parks_data_id($_GET['parks_data_id']));
+        }
+        break;
+
+
     // services to Pivot Biologic Park_services table
-    case 'get_all_relation_biologic_data_and_parks_data':
-        echo json_encode($pivotBiologicPark_services->get_all_relation_biologic_data_and_parks_data());
+    case 'get_all_relation_biologic_data_and_parks_data_by_biologic_data_id':
+        if (isset($_GET['biologic_data_id'])) {
+            echo json_encode($pivotBiologicPark_services->get_all_relation_biologic_data_and_parks_data_by_biologic_data_id($_GET['biologic_data_id']));
+        }
+        break;
+    case 'get_all_relation_biologic_data_and_parks_data_with_img_way_desc':
+        echo json_encode($pivotBiologicPark_services->get_all_relation_biologic_data_and_parks_data_with_img_way_desc());
         break;
 
 
