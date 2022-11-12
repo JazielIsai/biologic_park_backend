@@ -7,6 +7,11 @@ class Parks extends Controller {
         parent::__construct('biologic_park');
     }
 
+    public function get_all_name_and_id_parks () {
+        $query = "SELECT id, namePark FROM parks_data;";
+        return $this->select_query($query);
+    }
+
     // GET
     public function get_all_parks () {
         $query = "
@@ -74,20 +79,33 @@ class Parks extends Controller {
         return $this->select_query($query, array($searchPark));
     }
 
+    public function get_parks_by_user_id ($user_id) {
+        $query = "
+            SELECT namePark, trainingBackground, areaHa, form,
+                   boundaries, recreationAreas, street, suburb, latitude, length,
+                   municipality_bp.nameMunicipality AS municipality, city_states_bp.nameCityStates AS cityState
+            FROM parks_data
+            INNER JOIN municipality_bp ON parks_data.idMunicipality = municipality_bp.id
+            INNER JOIN city_states_bp ON parks_data.idCityStates = city_states_bp.id
+            WHERE parks_data.idUser = ?;
+        ";
+        return $this->select_query($query, array($user_id));
+    }
+
     // Insert
     public function add_park ($data) {
 
-        $query = "INSERT INTO parks_data
-                        (namePark, trainingbackground, areaha, form, boundaries,
-                         recreationareas, street, suburb, latitude, length,
-                         idmunicipality, idcitystates, idUser)
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        $query = "
+            INSERT INTO parks_data
+                    (namePark, trainingbackground, areaha, form, boundaries,
+                     recreationareas, street, suburb, latitude, length,
+                     idmunicipality, idcitystates, idUser)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        ";
 
-        $query_data = array($data->namePark, $data->trainingbackground, $data->areaha, $data->form, $data->form, $data->boundaries, $data->recreationareas, $data->street, $data->suburb, $data->latitude, $data->length, $data->idmunicipality, $data->idcitystates, $data->idUser);
+        $query_data = array($data->namePark, $data->trainingbackground, $data->areaha, $data->form, $data->boundaries, $data->recreationareas, $data->street, $data->suburb, $data->latitude, $data->length, $data->idmunicipality, $data->idcitystates, $data->idUser);
 
         return $this->insert_query($query, array($query_data));
     }
-
-
 
 }

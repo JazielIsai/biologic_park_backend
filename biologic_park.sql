@@ -65,7 +65,7 @@ DROP TABLE IF EXISTS city_states;
 
 INSERT INTO city_states_bp(nameCityStates) VALUES ("Guanajuato");
 
-SELECT * FROM city_states_bp;
+SELECT id, nameCityStates FROM city_states_bp;
 
 CREATE TABLE IF NOT EXISTS municipality_bp (
     id int not null auto_increment primary key,
@@ -126,11 +126,16 @@ INSERT INTO municipality_bp(nameMunicipality, idCityState) VALUES
 
 SELECT * FROM municipality_bp WHERE nameMunicipality = 'Leon';
 
+SELECT municipality_bp.id, municipality_bp.nameMunicipality
+    FROM municipality_bp
+    WHERE municipality_bp.idCityState = ?;
+
 SELECT municipality_bp.id, municipality_bp.nameMunicipality,
        city_states_bp.nameCityStates AS cityState
 FROM municipality_bp
 INNER JOIN city_states_bp
-    ON municipality_bp.idCityState = city_states_bp.id;
+    ON municipality_bp.idCityState = city_states_bp.id
+WHERE idCityState = 1;
 
 CREATE TABLE IF NOT EXISTS  parks_data (
     id int not null primary key auto_increment,
@@ -139,7 +144,7 @@ CREATE TABLE IF NOT EXISTS  parks_data (
     areaHa text,
     form text, -- forma
     boundaries text, -- colindancias
-    recreationAreas text, -- areasRecreo
+    recreationAreas text, -- areasRecreocion
     street text, -- calle
     suburb text, -- colonia
     latitude double,
@@ -153,6 +158,20 @@ CREATE TABLE IF NOT EXISTS  parks_data (
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS parks_data;
+
+ALTER TABLE parks_data
+    ADD COLUMN registrationDate DATE;
+
+ALTER TABLE parks_data
+    MODIFY COLUMN registrationDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+UPDATE parks_data
+    SET parks_data.registrationDate = '2022-03-05 14:00:10'
+    WHERE parks_data.id = 4;
+
+
+SELECT * FROM parks_data;
+SELECT * FROM biologic_data;
 
 INSERT INTO parks_data
     (namePark, trainingbackground, areaha, form, boundaries,
@@ -175,11 +194,26 @@ INSERT INTO parks_data(namePark, trainingbackground, areaha, form, boundaries,
 VALUES
     ('Gorrión Doméstico', '', '', '', '', '', '', '', 21.1218994, -101.736051412, 19, 1, 3);
 
+INSERT INTO parks_data(namePark, trainingbackground, areaha, form, boundaries,
+                       recreationareas, street, suburb, latitude, length,
+                       idmunicipality, idcitystates, idUser)
+VALUES
+    ('Jardines De Arandas', '', 'Cuadrado', '', '', '', 'Jardines De Arandas', 'Blvrd Arandas, 36807 Irapuato, Gto.', 20.7280905, -101.3760126211, 19, 1, 2);
+
+
 UPDATE parks_data
 SET namePark = 'Leon Gto' WHERE id = 3;
 
 
 SELECT * FROM parks_data;
+
+SELECT namePark, trainingBackground, areaHa, form,
+       boundaries, recreationAreas, street, suburb, latitude, length,
+       municipality_bp.nameMunicipality AS municipality, city_states_bp.nameCityStates AS cityState
+FROM parks_data
+INNER JOIN municipality_bp ON parks_data.idMunicipality = municipality_bp.id
+INNER JOIN city_states_bp ON parks_data.idCityStates = city_states_bp.id
+WHERE parks_data.idUser = ?;
 
 -- by id
 SELECT * FROM parks_data WHERE id = ?;
@@ -225,6 +259,7 @@ INNER JOIN city_states_bp ON parks_data.idCityStates = city_states_bp.id
 INNER JOIN users ON parks_data.idUser = users.id
 WHERE parks_data.namePark LIKE ?;
 
+
 SELECT namePark, trainingBackground, areaHa, form, boundaries,
        recreationAreas, street, suburb, latitude, length,
        municipality_bp.nameMunicipality as municipality,
@@ -237,6 +272,7 @@ INNER JOIN users ON parks_data.idUser = users.id
 WHERE parks_data.namePark LIKE ?;
 
 
+SELECT id, namePark FROM parks_data;
 
 CREATE TABLE IF NOT EXISTS images_parks (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -252,9 +288,19 @@ CREATE TABLE IF NOT EXISTS images_parks (
 ALTER TABLE images_parks
     ADD COLUMN sightingDate date;
 
+ALTER TABLE images_parks
+    MODIFY COLUMN sightingDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 SELECT * FROM images_parks;
 
+UPDATE images_parks
+SET images_parks.sightingDate = '2022-02-19 01:15:10'
+WHERE images_parks.id = 1;
+
 DROP TABLE IF EXISTS images_parks;
+
+INSERT INTO images_parks(name, ruta, author, idParks, idUser)
+VALUES (?, ?, ?, ?, ?);
 
 INSERT INTO images_parks(name, ruta, author, idParks, idUser)
 VALUES
@@ -271,7 +317,41 @@ FROM images_parks
 INNER JOIN users ON images_parks.idUser = users.id
 WHERE images_parks.idParks = ?;
 
+SELECT images_parks.id,
+       images_parks.name,
+       images_parks.ruta,
+       images_parks.author,
+       images_parks.sightingDate,
+       images_parks.idParks,
+       users.firstName AS imageWasResgisterByUser
+FROM images_parks
+INNER JOIN users ON images_parks.idUser = users.id
+WHERE images_parks.idUser = ?;
 
+SELECT images_parks.id,
+       images_parks.name,
+       images_parks.ruta,
+       images_parks.author,
+       images_parks.sightingDate,
+       images_parks.idParks,
+       images_parks.idUser,
+       parks_data.id,
+       parks_data.namePark,
+       parks_data.recreationAreas,
+       parks_data.latitude,
+       parks_data.length,
+       parks_data.street,
+       parks_data.suburb,
+       parks_data.idUser
+FROM images_parks
+RIGHT JOIN parks_data ON images_parks.idParks = parks_data.id
+WHERE images_parks.idUser = 2 OR parks_data.idUser = 2;
+
+SELECT * FROM users;
+
+SELECT * FROM parks_data;
+
+SELECT * FROM images_parks;
 
 
 CREATE TABLE IF NOT EXISTS category (
@@ -315,6 +395,26 @@ CREATE TABLE IF NOT EXISTS biologic_data(
     CONSTRAINT id_user FOREIGN KEY (idUser) REFERENCES users(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+ALTER TABLE biologic_data
+    ADD COLUMN registrationDate DATE;
+
+ALTER TABLE biologic_data
+    MODIFY COLUMN registrationDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+SELECT * FROM biologic_data;
+
+DELETE FROM biologic_data WHERE id = 4;
+
+UPDATE biologic_data
+SET biologic_data.registrationDate = '2022-02-04 11:15:10'
+WHERE biologic_data.id = 3;
+
+
+INSERT INTO biologic_data(commonName, scientificName,
+                          description, geographicalDistribution,
+                          naturalHistory, statusConservation, authorBiologicData,
+                          idCategory, idUser)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 INSERT INTO biologic_data(commonName, scientificName,
                           description, geographicalDistribution,
@@ -341,6 +441,13 @@ VALUES ('Gorrión Doméstico', 'Passer domesticus',
 
 SELECT * FROM biologic_data;
 
+SELECT biologic_data.commonName, biologic_data.scientificName, biologic_data.description,
+       biologic_data.geographicalDistribution, biologic_data.naturalHistory,
+       biologic_data.statusConservation, biologic_data.authorBiologicData,
+       category.description as category
+FROM biologic_data
+INNER JOIN category ON biologic_data.idCategory = category.id
+WHERE biologic_data.idUser = 2;
 
 SELECT biologic_data.commonName, biologic_data.scientificName, biologic_data.description,
        biologic_data.geographicalDistribution, biologic_data.naturalHistory,
@@ -393,11 +500,19 @@ CREATE TABLE IF NOT EXISTS images_biologic_data (
 
 DROP TABLE IF EXISTS images_biologic_data;
 
+ALTER TABLE images_biologic_data
+MODIFY COLUMN sightingDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+SELECT * FROM images_biologic_data;
+
+UPDATE images_biologic_data
+SET images_biologic_data.sightingDate = '2022-05-19 01:15:10'
+WHERE images_biologic_data.id = 1;
 
 INSERT INTO images_biologic_data(name, ruta, author,sightingDate, idBiologicalData, idUser)
 VALUES ('Calandria Dorso Negro Menor - Icterus cucullatus',
         '/var/www/html/biological_parks_backend/Images/ImgBiologicData/Calandria Dorso Negro Menor.jpeg',
-        'efrenbiologia', DEFAULT, 1, 1);
+        'efrenbiologia', DEFAULT, 1, 2);
 
 
 SELECT name, ruta, author,sightingDate, idBiologicalData,
@@ -456,7 +571,6 @@ INSERT INTO pivot_biologic_park(idBiologic, idParksData)
 VALUES (2,2), (3, 3);
 
 
-
 SELECT
     biologic_data.commonName,
     biologic_data.scientificName,
@@ -475,9 +589,11 @@ INNER JOIN biologic_data ON pivot_biologic_park.idBiologic = biologic_data.id
 INNER JOIN parks_data ON pivot_biologic_park.idParksData = parks_data.id
 WHERE biologic_data.id = ?;
 
+
 SELECT * FROM biologic_data;
 SELECT * FROM parks_data;
 SELECT * FROM images_biologic_data;
+
 
 SELECT pivot_biologic_park.id,
        pivot_biologic_park.idBiologic,
@@ -514,3 +630,116 @@ INNER JOIN images_biologic_data ON biologic_data.id = images_biologic_data.idBio
 INNER JOIN images_parks ON parks_data.id = images_parks.idParks
 WHERE users.id = ?;
 
+--  --
+
+
+(SELECT
+    CASE
+        WHEN biologic_data.id IS NOT NULL THEN 'Biologic Data'
+    END AS verificate,
+    biologic_data.commonName AS names,
+    biologic_data.scientificName AS column1,
+    biologic_data.description AS column2,
+    biologic_data.authorBiologicData AS column3,
+    biologic_data.naturalHistory AS column4,
+    biologic_data.geographicalDistribution AS column5,
+    biologic_data.registrationDate AS registrationDate
+FROM biologic_data WHERE biologic_data.idUser = 2
+UNION
+SELECT
+    CASE
+        WHEN parks_data.id IS NOT NULL THEN 'Parks Data'
+    END AS verificate,
+    parks_data.namePark AS names,
+    parks_data.recreationAreas AS column1,
+    parks_data.latitude AS column2,
+    parks_data.length AS column3,
+    parks_data.street AS column4,
+    parks_data.suburb AS column5,
+    parks_data.registrationDate AS registrationDate
+FROM parks_data WHERE idUser = 2)
+ORDER BY registrationDate DESC;
+
+(SELECT
+    images_biologic_data.id,
+    images_biologic_data.name,
+    images_biologic_data.ruta,
+    images_biologic_data.author,
+    images_biologic_data.sightingDate,
+    images_biologic_data.idBiologicalData
+FROM images_biologic_data
+WHERE images_biologic_data.idUser = 2
+UNION ALL
+SELECT
+    images_parks.id,
+    images_parks.name,
+    images_parks.ruta,
+    images_parks.author,
+    images_parks.sightingDate,
+    images_parks.idParks
+FROM images_parks
+WHERE images_parks.idUser = 2
+) ORDER BY sightingDate DESC;
+
+UPDATE images_biologic_data
+SET images_biologic_data.ruta = 'biological_parks_backend/Images/ImgBiologicData/Calandria Dorso Negro Menor.jpeg'
+WHERE images_biologic_data.idUser = 2;
+
+UPDATE images_parks
+SET images_parks.ruta = 'biological_parks_backend/Images/ImgParksData/Calandria Dorso Negro Menor.jpeg'
+WHERE images_parks.idUser = 2;
+
+(SELECT
+    CASE
+        WHEN biologic_data.id IS NOT NULL THEN 'Biologic Data'
+    END AS verificate,
+    biologic_data.commonName AS names,
+    biologic_data.scientificName AS column1,
+    biologic_data.description AS column2,
+    biologic_data.authorBiologicData AS column3,
+    biologic_data.naturalHistory AS column4,
+    biologic_data.geographicalDistribution AS column5,
+    biologic_data.registrationDate AS registrationDate
+FROM biologic_data WHERE biologic_data.idUser = 2
+UNION ALL
+SELECT
+    CASE
+        WHEN parks_data.id IS NOT NULL THEN 'Parks Data'
+    END AS verificate,
+    parks_data.namePark AS names,
+    parks_data.recreationAreas AS column1,
+    parks_data.latitude AS column2,
+    parks_data.length AS column3,
+    parks_data.street AS column4,
+    parks_data.suburb AS column5,
+    parks_data.registrationDate AS registrationDate
+FROM parks_data WHERE idUser = 2
+UNION ALL
+SELECT
+    CASE
+        WHEN images_biologic_data.id IS NOT NULL THEN 'img biologic data'
+    END AS verificate,
+    images_biologic_data.id,
+    images_biologic_data.name,
+    images_biologic_data.ruta,
+    images_biologic_data.author,
+    images_biologic_data.idBiologicalData,
+    images_biologic_data.idUser,
+    images_biologic_data.sightingDate AS registrationDate
+FROM images_biologic_data
+WHERE images_biologic_data.idUser = 2
+UNION ALL
+SELECT
+    CASE
+        WHEN images_parks.id IS NOT NULL THEN 'img parks data'
+    END AS verificate,
+    images_parks.id,
+    images_parks.name,
+    images_parks.ruta,
+    images_parks.author,
+    images_parks.idParks,
+    images_parks.idUser,
+    images_parks.sightingDate AS registrationDate
+FROM images_parks
+WHERE images_parks.idUser = 2
+)ORDER BY registrationDate DESC;

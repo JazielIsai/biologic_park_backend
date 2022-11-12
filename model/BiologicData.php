@@ -50,4 +50,31 @@ class BiologicData extends Controller {
         return $this->select_query($query, array($search_scientific_data));
     }
 
+    public function get_biologic_data_by_user_id ($user_id) {
+        $query = "
+            SELECT biologic_data.commonName, biologic_data.scientificName, biologic_data.description,
+                   biologic_data.geographicalDistribution, biologic_data.naturalHistory,
+                   biologic_data.statusConservation, biologic_data.authorBiologicData,
+                   category.description as category
+            FROM biologic_data
+            INNER JOIN category ON biologic_data.idCategory = category.id
+            WHERE biologic_data.idUser = ?;
+        ";
+
+        return $this->select_query($query, array($user_id));
+    }
+
+    public function add_biologic_data ($data) {
+        $query = "
+            INSERT INTO biologic_data(commonName, scientificName,
+                          description, geographicalDistribution,
+                          naturalHistory, statusConservation, authorBiologicData,
+                          idCategory, idUser)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+        ";
+        $query_data = array($data->commonName, $data->scientificName, $data->description, $data->geographicalDistribution, $data->naturalHistory, $data->statusConservation, $data->authorBiologicData, $data->idCategory, $data->idUser);
+
+        return $this->insert_query($query, array($query_data));
+    }
+
 }
