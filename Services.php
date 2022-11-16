@@ -65,6 +65,11 @@ switch ($servicesName) {
             echo json_encode($users_services->checking_if_exist_user($_GET['email'], $_GET['password']));
         }
         break;
+    case 'add_new_user':
+        if (isset($_POST)) {
+            echo json_encode($users_services->add_new_user(json_decode($_POST['data'])));
+        }
+        break;
 
     //parks services
     case 'get_all_name_and_id_parks':
@@ -108,6 +113,11 @@ switch ($servicesName) {
     case 'add_park':
         if (isset($_POST['data'])) {
             echo json_encode($parks_services->add_park(json_decode($_POST['data'])));
+        }
+        break;
+    case 'delete_park':
+        if (isset($_POST['id'])) {
+            echo json_encode($parks_services->delete_park(json_decode($_POST['id'])));
         }
         break;
 

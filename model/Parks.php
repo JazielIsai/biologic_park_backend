@@ -85,7 +85,7 @@ class Parks extends Controller {
 
     public function get_parks_by_user_id ($user_id) {
         $query = "
-            SELECT namePark, trainingBackground, areaHa, form,
+            SELECT parks_data.id, namePark, trainingBackground, areaHa, form,
                    boundaries, recreationAreas, street, suburb, latitude, length,
                    municipality_bp.nameMunicipality AS municipality, city_states_bp.nameCityStates AS cityState
             FROM parks_data
@@ -110,6 +110,14 @@ class Parks extends Controller {
         $query_data = array($data->namePark, $data->trainingbackground, $data->areaha, $data->form, $data->boundaries, $data->recreationareas, $data->street, $data->suburb, $data->latitude, $data->length, $data->idmunicipality, $data->idcitystates, $data->idUser);
 
         return $this->insert_query($query, array($query_data));
+    }
+
+    public function delete_park ($id) {
+        $query = "
+            DELETE FROM parks_data WHERE id = ?;
+        ";
+        $query_data = array($id);
+        return $this->update_delete_query($query, array($query_data));
     }
 
 }

@@ -29,4 +29,16 @@ class Users extends Controller {
         return $this->select_query($query, $query_data);
     }
 
+    public function add_new_user ($data) {
+        $query = "
+            INSERT INTO users(firstname, lastname, academicTitle, email, password, id_rol)
+            VALUES (?, ?, ?, ?, ?, ?);
+        ";
+        $query_data = array($data->firstname, $data->lastname, $data->academicTitle, $data->email, $data->password, $data->id_rol);
+
+        return $this->insert_query($query, array($query_data));
+    }
+
+
+
 }

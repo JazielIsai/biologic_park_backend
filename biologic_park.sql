@@ -35,6 +35,10 @@ UPDATE users
 SET password = '123456'
 WHERE id = 2;
 
+SELECT * FROM users;
+
+DELETE FROM users WHERE id = 7;
+
 SELECT id, firstname, lastname, academicTitle, email FROM users;
 
 SELECT users.id, firstname, lastname, academicTitle, email, id_rol,
