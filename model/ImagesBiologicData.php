@@ -7,26 +7,43 @@ class ImagesBiologicData extends Controller {
         parent::__construct('biologic_park');
     }
 
-    public function upload_image_by_biologic_data ($image_data) {
-        $fileImage = '../Images/ImgBiologicData';
+    public function add_img_biologic_data ($name, $ruta, $author, $id, $idUser) {
+
+        echo $name . ' - ' . $ruta . ' - ' . $author . ' - ' . $id . ' - ' . $idUser;
+
+        $query = "
+            INSERT INTO images_biologic_data (name, ruta, author, idBiologicalData, idUser)
+            VALUES (?, ?, ?, ?, ?);
+        ";
+        $query_data = array($name, $ruta, $author, $id, $idUser);
+
+        return $this->insert_query($query, array($query_data));
+    }
+
+    public function upload_image_by_biologic_data ($data) {
+
+        $fileImage = './Images/ImgBiologicData/';
 
         if (!is_dir($fileImage)) {
-           mkdir($fileImage);
+            mkdir($fileImage, 0755, true);
         }
 
-        $imgBiologicData = './';
-        if ( isset($_FILES['img']) ) {
-            $nameImg = $_FILES['img']['name'];
-            $ruta = $_FILES['img']['tmp_name'];
-            $destination = '';
-            if (move_uploaded_file($ruta, $destination)) {
-                $query = "INSERT INTO images_biologic_data(name, ruta, author, idBiologicalData, idUser)
-                           VALUES (?,?,?,?,?)";
-                $data = array([]);
-                return $this->insert_query($query, $data);
+        var_dump($data);
 
-            }
+        $img_path = $fileImage . $data->id . '_' . $data->name . '.png';
+
+        if (!isset($_FILES['photo'])) {
+            return 0;
         }
+
+        if( move_uploaded_file($_FILES['photo']['tmp_name'], $img_path )){
+            $save_path = 'biological_parks_backend/Images/ImgBiologicData/' . $data->id . '_' . $data->name . '.png';
+            $this->add_img_biologic_data($data->name, $save_path, $data->author, $data->id, $data->idUser);
+            return 1;
+        }
+
+        return 0;
+
     }
 
     public function get_img_by_biologic_data_id ($biologic_data_id) {

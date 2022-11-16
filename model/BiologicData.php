@@ -7,6 +7,16 @@ class BiologicData extends Controller {
         parent::__construct('biologic_park');
     }
 
+    public function get_all_name_and_id_biologic_data ($idUser) {
+        $query = "
+            SELECT biologic_data.id, biologic_data.commonName 
+            FROM biologic_data
+            WHERE biologic_data.idUser = ?;
+        ";
+
+        return $this->select_query($query, array($idUser));
+    }
+
     public function get_all_biological_data () {
         $query =
             "SELECT biologic_data.commonName, biologic_data.scientificName, biologic_data.description, 

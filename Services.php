@@ -68,7 +68,9 @@ switch ($servicesName) {
 
     //parks services
     case 'get_all_name_and_id_parks':
-        echo json_encode($parks_services->get_all_name_and_id_parks());
+        if (isset($_GET['user_id'])) {
+            echo json_encode($parks_services->get_all_name_and_id_parks($_GET['user_id']));
+        }
         break;
 
     case 'get_all_parks':
@@ -119,6 +121,11 @@ switch ($servicesName) {
 
 
     // services to biological data
+    case 'get_all_name_and_id_biologic_data':
+        if (isset($_GET['user_id'])) {
+            echo json_encode($biologicalData_services->get_all_name_and_id_biologic_data($_GET['user_id']));
+        }
+        break;
     case 'get_all_biological_data':
         echo json_encode($biologicalData_services->get_all_biological_data());
         break;
@@ -166,6 +173,12 @@ switch ($servicesName) {
             echo json_encode($biologicalData_services->add_biologic_data(json_decode($_POST['data'])));
         }
         break;
+    case 'upload_image_by_biologic_data':
+        if (isset($_POST['data'])) {
+            var_dump($_POST['data']);
+            echo json_encode($images_biologic_data->upload_image_by_biologic_data(json_decode($_POST['data'])));
+        }
+        break;
 
     // services to img parks data table
     case 'get_image_by_parks_data_id':
@@ -180,9 +193,9 @@ switch ($servicesName) {
         }
         break;
 
-    case 'add_image_to_parks':
+    case 'upload_image_by_park_data':
         if (isset($_POST['data'])) {
-            echo json_encode($images_park_data->add_image_to_parks(json_decode($_POST['data'])));
+            echo json_encode($images_park_data->upload_image_by_park_data(json_decode($_POST['data'])));
         }
         break;
 
@@ -213,6 +226,12 @@ switch ($servicesName) {
     case 'get_data_and_img_parks_biologic':
         if (isset( $_GET['parks_user_id'], $_GET['biologic_user_id'], $_GET['img_parks_user_id'], $_GET['img_biologic_user_id'] )) {
             echo json_encode($joinsTables_services->get_data_and_img_parks_biologic($_GET['parks_user_id'], $_GET['biologic_user_id'], $_GET['img_parks_user_id'], $_GET['img_biologic_user_id']));
+        }
+        break;
+
+    case 'add_relation_to_pivot_table':
+        if (isset($_POST['data'])) {
+            echo json_encode($pivotBiologicPark_services->add_relation_to_pivot_table(json_decode($_POST['data'])));
         }
         break;
 

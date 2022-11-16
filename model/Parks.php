@@ -7,9 +7,13 @@ class Parks extends Controller {
         parent::__construct('biologic_park');
     }
 
-    public function get_all_name_and_id_parks () {
-        $query = "SELECT id, namePark FROM parks_data;";
-        return $this->select_query($query);
+    public function get_all_name_and_id_parks ($user_id) {
+        $query = "
+            SELECT id, namePark 
+            FROM parks_data
+            WHERE parks_data.idUser = ?;
+        ";
+        return $this->select_query($query, array($user_id));
     }
 
     // GET

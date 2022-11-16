@@ -7,16 +7,39 @@ class ImageParkData extends  Controller {
         parent::__construct('biologic_park');
     }
 
-    public function upload_image_by_park_data () {
+    public function add_image_to_parks ($name, $ruta, $author, $id, $idUser) {
+        $query = "
+            INSERT INTO images_parks(name, ruta, author, idParks, idUser)
+            VALUES (?, ?, ?, ?, ?);
+        ";
+        $query_data = array($name, $ruta, $author, $id, $idUser);
 
-        $fileImage = '../Images/ImgParksData';
+        return $this->insert_query($query, array($query_data));
+    }
+
+    public function upload_image_by_park_data ($data) {
+
+        $fileImage = './Images/ImgParksData/';
 
         if (!is_dir($fileImage)) {
-            mkdir($fileImage);
+            mkdir($fileImage, 0755, true);
         }
 
+        var_dump($data);
 
+        $img_path = $fileImage . $data->id . '_' . $data->name . '.png' ;
 
+        if (!isset($_FILES['photo'])) {
+            return 0;
+        }
+
+        if(move_uploaded_file($_FILES['photo']['tmp_name'], $img_path )){
+            $save_path = 'biological_parks_backend/Images/ImgParksData/' . $data->id . '_' . $data->name . '.png' ;
+            $this->add_image_to_parks($data->name, $save_path, $data->author, $data->id, $data->idUser);
+            return 1;
+        }
+
+        return 0;
     }
 
     public function get_image_by_parks_data_id ($park_data_id) {
@@ -52,14 +75,5 @@ class ImageParkData extends  Controller {
         return $this->select_query($query, array($user_id));
     }
 
-    public function add_image_to_parks ($data) {
-        $query = "
-            INSERT INTO images_parks(name, ruta, author, idParks, idUser)
-            VALUES (?, ?, ?, ?, ?);
-        ";
-        $query_data = array($data->name, $data->ruta, $data->author, $data->idParks, $data->idUser);
-
-        return $this->insert_query($query, array($query_data));
-    }
 
 }

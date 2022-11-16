@@ -6,6 +6,32 @@ class PivotBiologicPark extends Controller {
         parent::__construct('biologic_park');
     }
 
+    public function add_relation_to_pivot_table ($data) {
+
+        $query_data = array($data->idBiologic, $data->idParksData);
+
+        $query_prev = "
+            SELECT * FROM pivot_biologic_park
+            WHERE idBiologic = ? AND idParksData = ?;
+        ";
+
+        $result = $this->select_query($query_prev, $query_data);
+
+        if ( count($result) == 0 ) {
+
+            $query = "
+                INSERT INTO pivot_biologic_park (idBiologic, idParksData)
+                VALUES (?, ?);
+            ";
+
+            $this->insert_query($query, array($query_data));
+
+            return 1;
+        }
+
+        return 0;
+    }
+
     public function get_all_relation_biologic_data_and_parks_data_by_biologic_data_id ($biologic_data_id) {
         $query = "
             SELECT

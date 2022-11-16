@@ -562,6 +562,9 @@ DROP TABLE IF EXISTS pivot_biologic_park;
 
 SELECT * FROM pivot_biologic_park;
 
+SELECT * FROM pivot_biologic_park
+WHERE idBiologic = 1 AND idParksData = 1;
+
 
 INSERT INTO pivot_biologic_park(idBiologic, idParksData)
 VALUES (1,1);
@@ -613,6 +616,9 @@ RIGHT OUTER JOIN parks_data ON pivot_biologic_park.idParksData = parks_data.id
 LEFT JOIN images_biologic_data ON biologic_data.id = images_biologic_data.idBiologicalData
 LEFT JOIN images_parks ON parks_data.id = images_parks.idParks
 ORDER BY pivot_biologic_park.id DESC;
+
+
+SELECT * FROM biologic_data;
 
 SELECT biologic_data.commonName AS commonName,
        biologic_data.scientificName AS scientificName,
