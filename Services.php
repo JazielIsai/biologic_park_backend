@@ -82,12 +82,6 @@ switch ($servicesName) {
         echo json_encode($parks_services->get_all_parks());
         break;
 
-    case 'get_park_by_id':
-        if ($_GET['idPark']) {
-            echo json_encode($parks_services->get_park_by_id($_GET['idPark']));
-        }
-        break;
-
     case 'get_parks_by_city_state':
         if ($_GET('search_city_state')) {
            echo json_encode($parks_services->get_parks_by_city_state($_GET['search_city_state']));
@@ -120,6 +114,16 @@ switch ($servicesName) {
             echo json_encode($parks_services->delete_park(json_decode($_POST['id'])));
         }
         break;
+    case 'get_park_by_id':
+        if (isset($_GET['id'])) {
+            echo json_encode($parks_services->get_park_by_id($_GET['id']));
+        }
+        break;
+    case 'update_park_data':
+        if (isset($_POST['data'])) {
+            echo json_encode($parks_services->update_park_data(json_decode($_POST['data'])));
+        }
+        break;
 
     // Services to biological category
     case 'get_all_category':
@@ -131,6 +135,11 @@ switch ($servicesName) {
 
 
     // services to biological data
+    case 'get_biologic_data_by_id':
+        if (isset($_GET['id'])) {
+            echo json_encode($biologicalData_services->get_biologic_data_by_id($_GET['id']));
+        }
+        break;
     case 'get_all_name_and_id_biologic_data':
         if (isset($_GET['user_id'])) {
             echo json_encode($biologicalData_services->get_all_name_and_id_biologic_data($_GET['user_id']));
@@ -154,6 +163,17 @@ switch ($servicesName) {
             echo json_encode($biologicalData_services->get_biologic_data_by_user_id($_GET['user_id']));
         }
         break;
+    case 'delete_biologic_data':
+        if ( isset($_POST['id']) ) {
+            echo json_encode($biologicalData_services->delete_biologic_data(json_decode($_POST['id'])));
+        }
+        break;
+    case 'update_biologic_data':
+        if (isset($_POST['data'])) {
+            json_encode($biologicalData_services->update_biologic_data(json_decode($_POST['data'])));
+        }
+        break;
+
 
     // services to cityState table
     case 'get_all_cityState':
@@ -189,6 +209,11 @@ switch ($servicesName) {
             echo json_encode($images_biologic_data->upload_image_by_biologic_data(json_decode($_POST['data'])));
         }
         break;
+    case 'delete_img_biologic_data':
+        if (isset($_POST['id'], $_POST['path'])) {
+            echo json_encode($images_biologic_data->delete_img_biologic_data(json_decode($_POST['id']), json_decode($_POST['path'])));
+        }
+        break;
 
     // services to img parks data table
     case 'get_image_by_parks_data_id':
@@ -208,10 +233,18 @@ switch ($servicesName) {
             echo json_encode($images_park_data->upload_image_by_park_data(json_decode($_POST['data'])));
         }
         break;
+    case 'delete_img_park_data':
+        if (isset($_POST['id'], $_POST['path'])) {
+            echo json_encode($images_park_data->delete_img_park_data(json_decode($_POST['id']), json_decode($_POST['path'])));
+        }
+        break;
 
 
 
     // services to Pivot Biologic Park_services table
+    case 'get_all_relation_biologic_data_and_parks_data':
+        echo json_encode($pivotBiologicPark_services->get_all_relation_biologic_data_and_parks_data());
+        break;
     case 'get_all_relation_biologic_data_and_parks_data_by_biologic_data_id':
         if (isset($_GET['biologic_data_id'])) {
             echo json_encode($pivotBiologicPark_services->get_all_relation_biologic_data_and_parks_data_by_biologic_data_id($_GET['biologic_data_id']));

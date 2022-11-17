@@ -4,7 +4,7 @@ class Parks extends Controller {
 
     public function __construct()
     {
-        parent::__construct('biologic_park');
+        parent::__construct('u400281830_biologic_park');
     }
 
     public function get_all_name_and_id_parks ($user_id) {
@@ -29,12 +29,6 @@ class Parks extends Controller {
             INNER JOIN users ON parks_data.idUser = users.id;";
 
         return $this->select_query($query);
-    }
-
-    public function get_park_by_id ($idPark) {
-        $query = "SELECT * FROM parks_data WHERE id = ?;";
-        $idPark = array($idPark);
-        return $this->select_query($query, $idPark);
     }
 
     public function get_parks_by_city_state ($cityState) {
@@ -117,6 +111,46 @@ class Parks extends Controller {
             DELETE FROM parks_data WHERE id = ?;
         ";
         $query_data = array($id);
+        return $this->update_delete_query($query, array($query_data));
+    }
+
+    public function get_park_by_id ($id) {
+
+        $query = "
+            SELECT parks_data.id, namePark, trainingBackground, areaHa, form,
+                   boundaries, recreationAreas, street, suburb, latitude, length,
+                   parks_data.idMunicipality, parks_data.idCityStates,
+                   municipality_bp.nameMunicipality AS municipality, city_states_bp.nameCityStates AS cityState
+            FROM parks_data
+            INNER JOIN municipality_bp ON parks_data.idMunicipality = municipality_bp.id
+            INNER JOIN city_states_bp ON parks_data.idCityStates = city_states_bp.id
+            WHERE parks_data.id = ?;
+        ";
+
+        return $this->select_query( $query, array($id) );
+    }
+
+    public function update_park_data ($data) {
+
+        $query = "
+            UPDATE parks_data t
+            SET
+                t.namePark  = ?,
+                t.trainingBackground = ?,
+                t.areaHa = ?,
+                t.form = ?,
+                t.boundaries = ?,
+                t.recreationAreas = ?,
+                t.street = ?,
+                t.suburb = ?,
+                t.latitude = ?,
+                t.length = ?,
+                t.idMunicipality = ?,
+                t.idCityStates = ?
+            WHERE t.id = ?;
+        ";
+        $query_data = array($data->namePark, $data->trainingBackground, $data->areaHa, $data->form, $data->boundaries, $data->recreationAreas, $data->street, $data->suburb, $data->latitude, $data->length, $data->idMunicipality, $data->idCityStates, $data->id);
+
         return $this->update_delete_query($query, array($query_data));
     }
 

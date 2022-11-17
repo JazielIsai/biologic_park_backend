@@ -4,7 +4,7 @@ class ImageParkData extends  Controller {
 
     public function __construct()
     {
-        parent::__construct('biologic_park');
+        parent::__construct('u400281830_biologic_park');
     }
 
     public function add_image_to_parks ($name, $ruta, $author, $id, $idUser) {
@@ -75,5 +75,23 @@ class ImageParkData extends  Controller {
         return $this->select_query($query, array($user_id));
     }
 
+    public function delete_img_park_data ($id, $path) {
+
+        if (unlink($path)) {
+            // file was successfully deleted
+            echo 'file deleted';
+        } else {
+            // there was a problem deleting the file
+            echo 'the file didnt cannot delete';
+        }
+
+        $query = "
+            DELETE FROM images_biologic_data WHERE id = ?;
+        ";
+
+        $query_data = array($id);
+
+        return $this->update_delete_query($query, array($query_data));
+    }
 
 }

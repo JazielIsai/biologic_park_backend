@@ -3,7 +3,7 @@
 class PivotBiologicPark extends Controller {
 
     public function __construct() {
-        parent::__construct('biologic_park');
+        parent::__construct('u400281830_biologic_park');
     }
 
     public function add_relation_to_pivot_table ($data) {
@@ -30,6 +30,29 @@ class PivotBiologicPark extends Controller {
         }
 
         return 0;
+    }
+
+    public function get_all_relation_biologic_data_and_parks_data () {
+        $query = "
+            SELECT
+                biologic_data.commonName,
+                biologic_data.scientificName,
+                biologic_data.description,
+                biologic_data.authorBiologicData,
+                biologic_data.naturalHistory,
+                biologic_data.geographicalDistribution,
+                parks_data.namePark,
+                parks_data.recreationAreas,
+                parks_data.latitude,
+                parks_data.length,
+                parks_data.street,
+                parks_data.suburb
+            FROM pivot_biologic_park
+            INNER JOIN biologic_data ON pivot_biologic_park.idBiologic = biologic_data.id
+            INNER JOIN parks_data ON pivot_biologic_park.idParksData = parks_data.id;
+        ";
+
+        return $this->select_query($query);
     }
 
     public function get_all_relation_biologic_data_and_parks_data_by_biologic_data_id ($biologic_data_id) {

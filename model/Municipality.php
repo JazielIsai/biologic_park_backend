@@ -4,7 +4,7 @@ class Municipality extends Controller {
 
     public function __construct()
     {
-        parent::__construct('biologic_park');
+        parent::__construct('u400281830_biologic_park');
     }
 
     public function get_all_municipality_by_id ($cityState_id) {
