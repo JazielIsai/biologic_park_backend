@@ -6,6 +6,7 @@ class PivotBiologicPark extends Controller {
         parent::__construct('u400281830_biologic_park');
     }
 
+
     public function add_relation_to_pivot_table ($data) {
 
         $query_data = array($data->idBiologic, $data->idParksData);
@@ -102,5 +103,51 @@ class PivotBiologicPark extends Controller {
         ";
         return $this->select_query($query);
     }
+
+    public function get_all_name_park_and_biologic_data_from_parks_id ($id) {
+        $query = "
+            SELECT
+                biologic_data.commonName,
+                parks_data.namePark
+            FROM pivot_biologic_park
+            INNER JOIN biologic_data ON pivot_biologic_park.idBiologic = biologic_data.id
+            INNER JOIN parks_data ON pivot_biologic_park.idParksData = parks_data.id
+            WHERE parks_data.id = ?;
+        ";
+
+        return $this->select_query($query, array($id));
+
+    }
+
+    public function get_all_name_park_and_biologic_data_from_biologic_data_id ($id) {
+        $query = "
+            SELECT
+                biologic_data.commonName,
+                parks_data.namePark
+            FROM pivot_biologic_park
+            INNER JOIN biologic_data ON pivot_biologic_park.idBiologic = biologic_data.id
+            INNER JOIN parks_data ON pivot_biologic_park.idParksData = parks_data.id
+            WHERE biologic_data.id = ?;
+        ";
+
+        return $this->select_query($query, array($id));
+
+    }
+
+    public function get_all_name_park_and_biologic_data_from_biologic_data_id_and_parks_id ($biologic_data_id, $parks_id) {
+        $query = "
+            SELECT
+                biologic_data.commonName,
+                parks_data.namePark
+            FROM pivot_biologic_park
+            INNER JOIN biologic_data ON pivot_biologic_park.idBiologic = biologic_data.id
+            INNER JOIN parks_data ON pivot_biologic_park.idParksData = parks_data.id
+            WHERE biologic_data.id = ? AND parks_data.id = ?;
+        ";
+
+        return $this->select_query($query, array($biologic_data_id, $parks_id));
+
+    }
+
 
 }

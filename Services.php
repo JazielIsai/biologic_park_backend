@@ -245,14 +245,40 @@ switch ($servicesName) {
     case 'get_all_relation_biologic_data_and_parks_data':
         echo json_encode($pivotBiologicPark_services->get_all_relation_biologic_data_and_parks_data());
         break;
+
     case 'get_all_relation_biologic_data_and_parks_data_by_biologic_data_id':
         if (isset($_GET['biologic_data_id'])) {
             echo json_encode($pivotBiologicPark_services->get_all_relation_biologic_data_and_parks_data_by_biologic_data_id($_GET['biologic_data_id']));
         }
         break;
+
     case 'get_all_relation_biologic_data_and_parks_data_with_img_way_desc':
         echo json_encode($pivotBiologicPark_services->get_all_relation_biologic_data_and_parks_data_with_img_way_desc());
         break;
+
+    case 'add_relation_to_pivot_table':
+        if (isset($_POST['data'])) {
+            echo json_encode($pivotBiologicPark_services->add_relation_to_pivot_table(json_decode($_POST['data'])));
+        }
+        break;
+    case 'get_all_name_park_and_biologic_data_from_parks_id':
+        if (isset($_GET['id'])) {
+            echo json_encode($pivotBiologicPark_services->get_all_name_park_and_biologic_data_from_parks_id($_GET['id']));
+        }
+        break;
+
+    case 'get_all_name_park_and_biologic_data_from_biologic_data_id':
+        if (isset($_GET['id'])) {
+            echo json_encode($pivotBiologicPark_services->get_all_name_park_and_biologic_data_from_biologic_data_id($_GET['id']));
+        }
+        break;
+
+    case 'get_all_name_park_and_biologic_data_from_biologic_data_id_and_parks_id':
+        if (isset($_GET['biologic_data_id'], $_GET['parks_id'])) {
+            echo json_encode($pivotBiologicPark_services->get_all_name_park_and_biologic_data_from_biologic_data_id_and_parks_id($_GET['biologic_data_id'], $_GET['parks_id']));
+        }
+        break;
+
 
     // joins tables services
     case 'get_join_tables_parks_and_biologic_data':
@@ -272,9 +298,13 @@ switch ($servicesName) {
         }
         break;
 
-    case 'add_relation_to_pivot_table':
-        if (isset($_POST['data'])) {
-            echo json_encode($pivotBiologicPark_services->add_relation_to_pivot_table(json_decode($_POST['data'])));
+    case 'get_all_data_img_biologic_data_and_parks':
+            echo json_encode($joinsTables_services->get_all_data_img_biologic_data_and_parks());
+        break;
+
+    case 'search_data_img_parks_biologic_data':
+        if(isset($_GET['commonName'], $_GET['namePark'], $_GET['img1'], $_GET['img2'])) {
+            echo json_encode($joinsTables_services->search_data_img_parks_biologic_data($_GET['commonName'], $_GET['namePark'], $_GET['img1'], $_GET['img2']));
         }
         break;
 

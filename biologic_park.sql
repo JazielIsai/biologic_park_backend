@@ -580,6 +580,14 @@ VALUES (2,2), (3, 3);
 
 SELECT
     biologic_data.commonName,
+    parks_data.namePark
+FROM pivot_biologic_park
+INNER JOIN biologic_data ON pivot_biologic_park.idBiologic = biologic_data.id
+INNER JOIN parks_data ON pivot_biologic_park.idParksData = parks_data.id
+WHERE parks_data.id = ? AND biologic_data.id = ?;
+
+SELECT
+    biologic_data.commonName,
     biologic_data.scientificName,
     biologic_data.description,
     biologic_data.authorBiologicData,
@@ -594,7 +602,8 @@ SELECT
 FROM pivot_biologic_park
 INNER JOIN biologic_data ON pivot_biologic_park.idBiologic = biologic_data.id
 INNER JOIN parks_data ON pivot_biologic_park.idParksData = parks_data.id
-WHERE biologic_data.id = ?;
+ORDER BY pivot_biologic_park.id DESC;
+-- WHERE biologic_data.id = ?;
 
 
 SELECT * FROM biologic_data;
@@ -641,6 +650,7 @@ INNER JOIN images_parks ON parks_data.id = images_parks.idParks
 WHERE users.id = ?;
 
 --  --
+
 
 
 (SELECT
@@ -752,4 +762,121 @@ SELECT
     images_parks.sightingDate AS registrationDate
 FROM images_parks
 WHERE images_parks.idUser = 2
+)ORDER BY registrationDate DESC;
+
+
+(SELECT
+    CASE
+        WHEN biologic_data.id IS NOT NULL THEN 'Biologic Data'
+    END AS verificate,
+    biologic_data.commonName AS names,
+    biologic_data.scientificName AS column1,
+    biologic_data.description AS column2,
+    biologic_data.authorBiologicData AS column3,
+    biologic_data.naturalHistory AS column4,
+    biologic_data.geographicalDistribution AS column5,
+    biologic_data.registrationDate AS registrationDate
+FROM biologic_data
+WHERE biologic_data.commonName LIKE ?
+UNION ALL
+SELECT
+    CASE
+        WHEN parks_data.id IS NOT NULL THEN 'Parks Data'
+    END AS verificate,
+    parks_data.namePark AS names,
+    parks_data.recreationAreas AS column1,
+    parks_data.latitude AS column2,
+    parks_data.length AS column3,
+    parks_data.street AS column4,
+    parks_data.suburb AS column5,
+    parks_data.registrationDate AS registrationDate
+FROM parks_data
+WHERE parks_data.namePark LIKE ?
+UNION ALL
+SELECT
+    CASE
+        WHEN images_biologic_data.id IS NOT NULL THEN 'img biologic data'
+    END AS verificate,
+    images_biologic_data.id,
+    images_biologic_data.name,
+    images_biologic_data.ruta,
+    images_biologic_data.author,
+    images_biologic_data.idBiologicalData,
+    images_biologic_data.idUser,
+    images_biologic_data.sightingDate AS registrationDate
+FROM images_biologic_data
+WHERE images_biologic_data.name LIKE ?
+UNION ALL
+SELECT
+    CASE
+        WHEN images_parks.id IS NOT NULL THEN 'img parks data'
+    END AS verificate,
+    images_parks.id,
+    images_parks.name,
+    images_parks.ruta,
+    images_parks.author,
+    images_parks.idParks,
+    images_parks.idUser,
+    images_parks.sightingDate AS registrationDate
+FROM images_parks
+WHERE images_parks.name LIKE ?
+) ORDER BY registrationDate DESC;
+
+
+
+(SELECT
+    CASE
+        WHEN biologic_data.id IS NOT NULL THEN 'Biologic Data'
+    END AS verificate,
+    biologic_data.id AS ID,
+    biologic_data.commonName AS names,
+    biologic_data.scientificName AS column1,
+    biologic_data.description AS column2,
+    biologic_data.authorBiologicData AS column3,
+    biologic_data.naturalHistory AS column4,
+    biologic_data.geographicalDistribution AS column5,
+    biologic_data.registrationDate AS registrationDate
+FROM biologic_data
+UNION ALL
+SELECT
+    CASE
+        WHEN parks_data.id IS NOT NULL THEN 'Parks Data'
+    END AS verificate,
+    parks_data.id AS ID,
+    parks_data.namePark AS names,
+    parks_data.recreationAreas AS column1,
+    parks_data.latitude AS column2,
+    parks_data.length AS column3,
+    parks_data.street AS column4,
+    parks_data.suburb AS column5,
+    parks_data.registrationDate AS registrationDate
+FROM parks_data
+UNION ALL
+SELECT
+    CASE
+        WHEN images_biologic_data.id IS NOT NULL THEN 'img biologic data'
+    END AS verificate,
+    images_biologic_data.id AS ID,
+    images_biologic_data.id,
+    images_biologic_data.name,
+    images_biologic_data.ruta,
+    images_biologic_data.author,
+    images_biologic_data.idBiologicalData,
+    images_biologic_data.idUser,
+    images_biologic_data.sightingDate AS registrationDate
+FROM images_biologic_data
+UNION ALL
+SELECT
+    CASE
+        WHEN images_parks.id IS NOT NULL THEN 'img parks data'
+    END AS verificate,
+    images_parks.id AS ID,
+    images_parks.id,
+    images_parks.name,
+    images_parks.ruta,
+    images_parks.author,
+    images_parks.idParks,
+    images_parks.idUser,
+    images_parks.sightingDate AS registrationDate
+FROM images_parks
 )ORDER BY registrationDate DESC;
